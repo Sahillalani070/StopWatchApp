@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import React, { useState, useRef, useCallback } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
   const [time, setTime] = useState(0);
@@ -9,23 +10,14 @@ export default function App() {
   const timer = useRef(null);
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <Stopwatch />
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
 // Calculation and presentation:
 const padToTwo = (number) => (number <= 9 ? `0${number}` : number); // used to pad in the format 00:00:00
-export const displaytime = (centisec) => {
+const displaytime = (centisec) => {
   let min = 0;
   let sec = 0;
 
@@ -68,24 +60,40 @@ function Stopwatch() {
     clearInterval(timer.current);
     setRunning(false);
   }, [isRunning]);
+  return (
+    <SafeAreaView>
+      <StatusBar style='light' />
+      <View>
+        <Text style={styles.digitalclock}>{displaytime(time)}</Text>
+      </View>
+      <View style={styles.controls}>
+        <Controls
+          isRunning={isRunning}
+          handleLeftPress={handleLeftPress}
+          handleCenterPress={handleCenterPress}
+          handleRightPress={handleRightPress}
+        />
+      </View>
+    </SafeAreaView>
+  );
 }
 function Controls({ isRunning, handleLeftPress, handleCenterPress, handleRightPress }) {
   return (
     <>
       <TouchableOpacity
-        style={[]}
+        style={[styles.buttonBorder]}
         onPress={handleLeftPress}>
-        <View>
-          <Text style={{}}>
+        <View style={[styles.textBorder, { borderColor: "#9A9A9A", backgroundColor: "#9A9A9A" }]}>
+          <Text>
             {"Reset"}
           </Text>
         </View>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[]}
+        style={[styles.buttonBorder]}
         onPress={handleCenterPress}>
-        <View>
-          <Text style={{}}>
+        <View style={[styles.textBorder, { borderColor: isRunning ? "#9A9A9A" : "#37d05c", backgroundColor: isRunning ? "#9A9A9A" : "#37d05c" }]}>
+          <Text>
             {"Start"}
           </Text>
         </View>
@@ -93,8 +101,8 @@ function Controls({ isRunning, handleLeftPress, handleCenterPress, handleRightPr
       <TouchableOpacity
         style={[]}
         onPress={handleRightPress}>
-        <View>
-          <Text style={[]}>
+        <View style={[styles.textBorder, { borderColor: isRunning ? "#ea4c49" : "#9A9A9A", backgroundColor: isRunning ? "#ea4c49" : "#9A9A9A" }]}>
+          <Text>
             {"Stop"}
           </Text>
         </View>
@@ -102,4 +110,40 @@ function Controls({ isRunning, handleLeftPress, handleCenterPress, handleRightPr
     </>
   )
 }
+// Styles For all the components
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'black',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  digitalclock: {
+    color: "#fff",
+    fontSize: 70,
+    fontWeight: "200",
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  buttonBorder: {
+    width: 70,
+    height: 70,
+    borderRadius: 70,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textBorder: {
+    width: 65,
+    height: 65,
+    borderRadius: 65,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  controls: {
+    height: 80,
+    flexDirection: "row",
+    justifyContent: "space-around"
+  }
+});
 //export default React.memo(Controls);
